@@ -1,8 +1,5 @@
 package graphs;
 
-import route_planner.Junction;
-import route_planner.Road;
-
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -293,26 +290,57 @@ public class DirectedGraph<V extends Identifiable, E> {
 
         // TODO calculate the path from start to target by recursive depth-first-search
 
-        if (path.getVisited().contains(start)) {
+        path.vertices.addFirst(start);
+
+        if (start == target) {
+            path.visited.add(start);
+            return path;
+        }
+        path.vertices = dfsRecursive(path.vertices.getFirst(), target, path.visited);
+        return path;
+
+//        if (path.getVisited().contains(start)) {
+//            return null;
+//        }
+//
+//        path.vertices.addFirst(start);
+//        path.visited.add(start);
+//
+//        if (start.equals(target)) {
+//            return path;
+//        }
+//
+//        for (V vertice : this.getNeighbours(start)) {
+//            for (V v : this.getNeighbours(vertice)) {
+//                if (!path.vertices.contains(v)) {
+//                    path.vertices.add(v);
+//                }
+//                path.visited.add(v);
+//                if (v.equals(target)) {
+//                    return path;
+//                }
+//            }
+//        }
+//        return null;
+    }
+
+    private Deque<V> dfsRecursive(V current, V target, Set<V> visited) {
+        if (visited.contains(current)) {
             return null;
         }
 
-        path.vertices.addFirst(start);
-        path.visited.add(start);
+        visited.add(current);
 
-        if (start.equals(target)) {
+        if (current.equals(target)) {
+            Deque<V> path = new LinkedList<>();
+            path.addLast(target);
             return path;
         }
-
-        for (V vertice : this.getNeighbours(start)) {
-            for (V v : this.getNeighbours(vertice)) {
-                if (!path.vertices.contains(v)) {
-                    path.vertices.add(v);
-                }
-                path.visited.add(v);
-                if (v.equals(target)) {
-                    return path;
-                }
+        for (V neighbour : this.getNeighbours(current)) {
+            Deque<V> path = dfsRecursive(neighbour, target, visited);
+            if (path != null) {
+                path.addFirst(current);
+                return path;
             }
         }
         return null;
@@ -338,16 +366,41 @@ public class DirectedGraph<V extends Identifiable, E> {
         // initialise the result path of the search
         DGPath path = new DGPath();
         path.visited.add(start);
+        path.vertices.addFirst(start);
 
         // easy target
         if (start.equals(target)) {
-            path.vertices.add(target);
             return path;
         }
 
         // TODO calculate the path from start to target by breadth-first-search
 
+        Queue<V> queue = new LinkedList<>();
+        Map<V, V> visitedFrom = new HashMap<>();
 
+        queue.add(start);
+        visitedFrom.put(start, null);
+        V current = queue.poll();
+
+        while (current != null) {
+            for (V neighbour : this.getNeighbours(current)) {
+                path.visited.add(neighbour);
+                if (neighbour.equals(target)) {
+                    path.vertices.add(current);
+                    while (current != null) {
+                        if (!path.vertices.contains(neighbour)) {
+                            path.vertices.add(neighbour);
+                        }
+                        current = visitedFrom.get(current);
+                    }
+                    return path;
+                } else if (!visitedFrom.containsKey(neighbour)) {
+                    visitedFrom.put(neighbour, current);
+                    queue.offer(neighbour);
+                }
+            }
+            current = queue.poll();
+        }
         return null;
     }
 
