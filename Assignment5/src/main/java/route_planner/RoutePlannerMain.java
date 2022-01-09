@@ -32,6 +32,7 @@ public class RoutePlannerMain {
         // now we have an accident between Diemen and Weesp...
         // TODO change the roadMap such that max average speed from Diemen to Weesp is only 5 km/h
 
+        roadMap.getEdge(roadMap.getVertexById("Diemen"), roadMap.getVertexById("Weesp")).setMaxSpeed(5);
 
         // find the fastest route avoiding the accident
         RoadMap.DGPath path =

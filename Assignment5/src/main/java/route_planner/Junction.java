@@ -4,6 +4,7 @@ import graphs.Identifiable;
 
 import java.io.PrintStream;
 import java.util.Locale;
+import java.util.Objects;
 
 public class Junction implements Identifiable
         // TODO extend superclass and/or implement interfaces
@@ -118,5 +119,16 @@ public class Junction implements Identifiable
     // TODO more implementations as required for use with DirectedGraph, HashSet and/or HashMap
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Junction junction = (Junction) o;
+        return name.equals(junction.name);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
 }

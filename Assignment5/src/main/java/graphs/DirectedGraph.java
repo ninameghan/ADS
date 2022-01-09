@@ -291,56 +291,58 @@ public class DirectedGraph<V extends Identifiable, E> {
         // TODO calculate the path from start to target by recursive depth-first-search
 
         path.vertices.addFirst(start);
+//        path.visited.add(start);
 
-        if (start == target) {
-            path.visited.add(start);
+        if (start.equals(target)) {
+            path.visited.add(target);
             return path;
         }
-        path.vertices = dfsRecursive(path.vertices.getFirst(), target, path.visited);
-        return path;
 
-//        if (path.getVisited().contains(start)) {
-//            return null;
-//        }
-//
-//        path.vertices.addFirst(start);
-//        path.visited.add(start);
-//
-//        if (start.equals(target)) {
-//            return path;
-//        }
-//
-//        for (V vertice : this.getNeighbours(start)) {
-//            for (V v : this.getNeighbours(vertice)) {
-//                if (!path.vertices.contains(v)) {
-//                    path.vertices.add(v);
-//                }
-//                path.visited.add(v);
-//                if (v.equals(target)) {
-//                    return path;
-//                }
-//            }
-//        }
-//        return null;
+        path.vertices = dfsRecursive(start, target, path.visited);
+        return path;
     }
 
     private Deque<V> dfsRecursive(V current, V target, Set<V> visited) {
-        if (visited.contains(current)) {
+//        if (path.getVisited().contains(current)) {
+//            return null;
+//        }
+//
+//        path.getVisited().add(current);
+//
+//        if (current.equals(target)) {
+////            path.visited.add(target);
+//            return path;
+//        }
+//
+//        for (V neighbour : this.getNeighbours(current)) {
+//            path.vertices.add(neighbour);
+//            if (neighbour.equals(target)){
+//                return path;
+//            }
+//            path = dfsRecursive(neighbour, target, path);
+//            if (path != null) {
+//                path.visited.add(current);
+//            }
+//            return path;
+//        }
+//        return null;
+
+        if (visited.contains(current)){
             return null;
         }
-
         visited.add(current);
-
-        if (current.equals(target)) {
+        if (current.equals(target)){
             Deque<V> path = new LinkedList<>();
-            path.addLast(target);
+            path.addLast(current);
             return path;
         }
         for (V neighbour : this.getNeighbours(current)) {
-            Deque<V> path = dfsRecursive(neighbour, target, visited);
-            if (path != null) {
-                path.addFirst(current);
-                return path;
+            if (!visited.contains(neighbour)){
+                Deque<V> path = dfsRecursive(neighbour, target, visited);
+                if (path != null){
+                    path.addFirst(current);
+                    return path;
+                }
             }
         }
         return null;
@@ -458,23 +460,89 @@ public class DirectedGraph<V extends Identifiable, E> {
         // initialise the progress of the start node
         DSPNode nextDspNode = new DSPNode(start);
         nextDspNode.weightSumTo = 0.0;
+        nextDspNode.marked = true;
         progressData.put(start, nextDspNode);
+
+        Map<V, E> visitedEdges = new HashMap<>();
+        visitedEdges.put(start, null);
 
         while (nextDspNode != null) {
 
-            // TODO continue Dijkstra's algorithm to process nextDspNode
-            //  mark nodes as you complete their processing
-            //  register all visited vertices while going for statistical purposes
-            //  if you hit the target: complete the path and bail out !!!
+            for (E edge : this.getEdges(nextDspNode.vertex)) {
+                V neighbour = nextDspNode.vertex;
+                DSPNode neighbourNode = new DSPNode(neighbour);
+                double weight = weightMapper.apply(edge);
+                double distanceFromNextNode = nextDspNode.weightSumTo + weight;
+                if (distanceFromNextNode < neighbourNode.weightSumTo) {
+                    neighbourNode.weightSumTo = distanceFromNextNode;
+                    neighbourNode.fromVertex = neighbour;
+                    neighbourNode.marked = true;
+                    progressData.put(neighbour, neighbourNode);
+                }
 
-
-            // TODO find the next nearest node that is not marked yet
-
+                /*
+                 find the next nearest node that is not marked yet
+                //  nextDspNode = progressData.values().stream()...
+                 */
+            }
+            if (nextDspNode.vertex == target) break;
+            nextDspNode = progressData.values().stream().filter(dspNode -> !dspNode.marked).reduce((o1, o2) -> {
+                int compare = Double.compare(o1.weightSumTo, o2.weightSumTo);
+                if (compare > 0) return o1;
+                else if (compare < 0) return o2;
+                else return o1;
+            }).orElse(null);
         }
 
+        path.totalWeight = progressData.values().stream().mapToDouble(value -> value.weightSumTo).sum();
+
         // no path found, graph was not connected ???
-        return null;
+        return path;
     }
+
+    // TODO continue Dijkstra's algorithm to process nextDspNode
+    //  mark nodes as you complete their processing
+    //  register all visited vertices while going for statistical purposes
+    //  if you hit the target: complete the path and bail out !!!
+
+//            for (V neighbour : this.getNeighbours(nextDspNode.vertex)){
+//                DSPNode neighbourNode = new DSPNode(neighbour);
+//                double weight = weightMapper.apply(this.getEdge(neighbourNode.vertex, neighbour));
+//                double distanceFromNextNode = nextDspNode.weightSumTo + weight;
+//                if (distanceFromNextNode < neighbourNode.weightSumTo){
+//                    neighbourNode.weightSumTo = distanceFromNextNode;
+//                    neighbourNode.fromVertex = neighbour;
+//                    neighbourNode.marked = true;
+//                    progressData.put(neighbour, neighbourNode);
+//                }
+//
+//            }
+//            if (nextDspNode.vertex == target) break;
+//            nextDspNode = progressData.values().stream().filter(dspNode -> !dspNode.marked).reduce((o1, o2) -> {
+//                int compare = Double.compare(o1.weightSumTo, o2.weightSumTo);
+//                if (compare > 0){
+////                        path.vertices.add(o1.vertex) ;
+//                    return o1;
+//                }
+//                else if (compare < 0){
+////                        path.vertices.add(o2.vertex);
+//                    return o2;
+//                }
+//                else return o1;
+//            }).orElse(null);
+//
+//
+//            // TODO find the next nearest node that is not marked yet
+//
+//
+//
+////            return path;
+//        }
+//        path.totalWeight = progressData.values().stream().mapToDouble(value -> value.weightSumTo).sum();
+//
+//        // no path found, graph was not connected ???
+//        return path;
+//    }
 
 
     @Override
