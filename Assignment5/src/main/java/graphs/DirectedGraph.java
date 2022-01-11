@@ -45,11 +45,8 @@ public class DirectedGraph<V extends Identifiable, E> {
      * @return null if fromVertex cannot be found in the graph
      * an empty collection if fromVertex has no neighbours
      */
-    public Collection<V> getNeighbours(V fromVertex) { //done
+    public Collection<V> getNeighbours(V fromVertex) {
         if (fromVertex == null) return null;
-
-        // TODO retrieve the collection of neighbour vertices of fromVertex out of the edges data structure
-
         if (vertices.containsValue(fromVertex)) {
             List<V> helperList = new ArrayList<>();
             for (Map.Entry<V, Map<V, E>> entry : edges.entrySet()) {
@@ -75,11 +72,8 @@ public class DirectedGraph<V extends Identifiable, E> {
      * @return null if fromVertex cannot be found in the graph
      * an empty collection if fromVertex has no out-going edges
      */
-    public Collection<E> getEdges(V fromVertex) { //done
+    public Collection<E> getEdges(V fromVertex) {
         if (fromVertex == null) return null;
-
-        // TODO retrieve the collection of out-going edges which connect fromVertex with a neighbour in the edges data structure
-
         return edges.get(fromVertex).values();
     }
 
@@ -96,10 +90,7 @@ public class DirectedGraph<V extends Identifiable, E> {
      * @return the duplicate of newVertex with the same id that already exists in the graph,
      * or newVertex itself if it has been added.
      */
-    public V addOrGetVertex(V newVertex) { //done
-        // TODO add and return the newVertex, or return the existing duplicate vertex with the same Id
-        //  pay attention to sustaining representation invariant items 1. and 4.
-
+    public V addOrGetVertex(V newVertex) {
         if (this.vertices.putIfAbsent(newVertex.getId(), newVertex) == null) {
             return newVertex;
         } else {
@@ -118,9 +109,7 @@ public class DirectedGraph<V extends Identifiable, E> {
      * @param newEdge    the instance with edge information
      * @return whether the edge has been added successfully
      */
-    public boolean addEdge(V fromVertex, V toVertex, E newEdge) { //done
-        // TODO add (directed) newEdge to the graph between fromVertex and toVertex
-
+    public boolean addEdge(V fromVertex, V toVertex, E newEdge) {
         if (fromVertex == null || toVertex == null || fromVertex.equals(toVertex) || getEdge(fromVertex, toVertex) != null) {
             return false;
         }
@@ -146,9 +135,7 @@ public class DirectedGraph<V extends Identifiable, E> {
      * @param newEdge the instance with edge information
      * @return whether the edge has been added successfully
      */
-    public boolean addEdge(String fromId, String toId, E newEdge) { //done
-        // TODO add (directed) newEdge to the graph between fromId and toId
-
+    public boolean addEdge(String fromId, String toId, E newEdge) {
         return this.addEdge(this.getVertexById(fromId), this.getVertexById(toId), newEdge);
     }
 
@@ -186,10 +173,8 @@ public class DirectedGraph<V extends Identifiable, E> {
      * @return the designated directed edge that has been registered in the graph
      * returns null if no connection has been set up between these vertices in the specified direction
      */
-    public E getEdge(V fromVertex, V toVertex) { //done
+    public E getEdge(V fromVertex, V toVertex) {
         if (fromVertex == null || toVertex == null) return null;
-        // TODO retrieve the directed edge between vertices fromVertex and toVertex from the graph
-
         if (edges.containsKey(fromVertex) && edges.get(fromVertex).containsKey(toVertex)) {
             return edges.get(fromVertex).get(toVertex);
         }
@@ -212,8 +197,7 @@ public class DirectedGraph<V extends Identifiable, E> {
      *
      * @return the total number of edges in the graph
      */
-    public int getNumEdges() { //done
-        // TODO calculate and return the total number of directed edges in the graph
+    public int getNumEdges() {
         return edges.values().stream().mapToInt(Map::size).sum();
     }
 
@@ -280,7 +264,7 @@ public class DirectedGraph<V extends Identifiable, E> {
      * returns null if either start or target cannot be matched with a vertex in the graph
      * or no path can be found from start to target
      */
-    public DGPath depthFirstSearch(String startId, String targetId) { //done
+    public DGPath depthFirstSearch(String startId, String targetId) {
 
         V start = getVertexById(startId);
         V target = getVertexById(targetId);
@@ -288,10 +272,7 @@ public class DirectedGraph<V extends Identifiable, E> {
 
         DGPath path = new DGPath();
 
-        // TODO calculate the path from start to target by recursive depth-first-search
-
         path.vertices.addFirst(start);
-//        path.visited.add(start);
 
         if (start.equals(target)) {
             path.visited.add(target);
@@ -303,43 +284,20 @@ public class DirectedGraph<V extends Identifiable, E> {
     }
 
     private Deque<V> dfsRecursive(V current, V target, Set<V> visited) {
-//        if (path.getVisited().contains(current)) {
-//            return null;
-//        }
-//
-//        path.getVisited().add(current);
-//
-//        if (current.equals(target)) {
-////            path.visited.add(target);
-//            return path;
-//        }
-//
-//        for (V neighbour : this.getNeighbours(current)) {
-//            path.vertices.add(neighbour);
-//            if (neighbour.equals(target)){
-//                return path;
-//            }
-//            path = dfsRecursive(neighbour, target, path);
-//            if (path != null) {
-//                path.visited.add(current);
-//            }
-//            return path;
-//        }
-//        return null;
 
-        if (visited.contains(current)){
+        if (visited.contains(current)) {
             return null;
         }
         visited.add(current);
-        if (current.equals(target)){
+        if (current.equals(target)) {
             Deque<V> path = new LinkedList<>();
             path.addLast(current);
             return path;
         }
         for (V neighbour : this.getNeighbours(current)) {
-            if (!visited.contains(neighbour)){
+            if (!visited.contains(neighbour)) {
                 Deque<V> path = dfsRecursive(neighbour, target, visited);
-                if (path != null){
+                if (path != null) {
                     path.addFirst(current);
                     return path;
                 }
@@ -374,8 +332,6 @@ public class DirectedGraph<V extends Identifiable, E> {
         if (start.equals(target)) {
             return path;
         }
-
-        // TODO calculate the path from start to target by breadth-first-search
 
         Queue<V> queue = new LinkedList<>();
         Map<V, V> visitedFrom = new HashMap<>();
@@ -453,97 +409,90 @@ public class DirectedGraph<V extends Identifiable, E> {
             return path;
         }
 
-        // keep track of the DSP status of all visited nodes
-        // you may choose a different approach of tracking progress of the algorithm, if you wish
-        Map<V, DSPNode> progressData = new HashMap<>();
-
         // initialise the progress of the start node
-        DSPNode nextDspNode = new DSPNode(start);
-        nextDspNode.weightSumTo = 0.0;
-        nextDspNode.marked = true;
-        progressData.put(start, nextDspNode);
+        DSPNode dspNode = new DSPNode(start);
+        dspNode.weightSumTo = 0.0;
 
-        Map<V, E> visitedEdges = new HashMap<>();
-        visitedEdges.put(start, null);
+        Set<DSPNode> nodes = new HashSet<>();
 
-        while (nextDspNode != null) {
+        V current = start;
+        DSPNode currentDspNode = new DSPNode(null);
 
-            for (E edge : this.getEdges(nextDspNode.vertex)) {
-                V neighbour = nextDspNode.vertex;
-                DSPNode neighbourNode = new DSPNode(neighbour);
-                double weight = weightMapper.apply(edge);
-                double distanceFromNextNode = nextDspNode.weightSumTo + weight;
-                if (distanceFromNextNode < neighbourNode.weightSumTo) {
-                    neighbourNode.weightSumTo = distanceFromNextNode;
-                    neighbourNode.fromVertex = neighbour;
-                    neighbourNode.marked = true;
-                    progressData.put(neighbour, neighbourNode);
+        nodes.add(dspNode);
+        while (current != null) {
+            for (V neighbour : getNeighbours(current)) {
+                boolean hasNode = false;
+                DSPNode currentNeighbour = new DSPNode(null);
+                for (DSPNode existing : nodes) {
+                    if (existing.vertex == neighbour) {
+                        hasNode = true;
+                        currentNeighbour = existing;
+                    }
+                    if (current == existing.vertex) {
+                        currentDspNode = existing;
+                    }
                 }
-
-                /*
-                 find the next nearest node that is not marked yet
-                //  nextDspNode = progressData.values().stream()...
-                 */
+                if (!hasNode) {
+                    DSPNode node = new DSPNode(neighbour);
+                    nodes.add(node);
+                    currentNeighbour = node;
+                }
+                if (currentDspNode.weightSumTo + weightMapper.apply(getEdge(current, currentNeighbour.vertex))
+                        < currentNeighbour.weightSumTo) {
+                    currentNeighbour.weightSumTo = currentDspNode.weightSumTo +
+                            weightMapper.apply(getEdge(current, currentNeighbour.vertex));
+                    currentNeighbour.fromVertex = currentDspNode.vertex;
+                }
+                if (neighbour.equals(target)) {
+                    for (DSPNode firstNode : nodes) {
+                        path.visited.add(firstNode.vertex);
+                    }
+                    for (V nextNeighbour : getNeighbours(currentNeighbour.vertex)) {
+                        for (DSPNode secondNode : nodes) {
+                            if (secondNode.vertex.equals(nextNeighbour)) {
+                                if (secondNode.weightSumTo + weightMapper.apply(getEdge(nextNeighbour,
+                                        currentNeighbour.vertex)) < currentNeighbour.weightSumTo) {
+                                    currentNeighbour.weightSumTo = secondNode.weightSumTo +
+                                            weightMapper.apply(getEdge(nextNeighbour, currentNeighbour.vertex));
+                                    currentNeighbour.fromVertex = secondNode.vertex;
+                                }
+                            }
+                        }
+                    }
+                    DSPNode vertexNode = currentNeighbour;
+                    while (vertexNode.fromVertex != null) {
+                        for (DSPNode node : nodes) {
+                            if (node.vertex == vertexNode.fromVertex) {
+                                path.vertices.addFirst(vertexNode.vertex);
+                                vertexNode = node;
+                            }
+                        }
+                    }
+                    path.vertices.addFirst(vertexNode.vertex);
+                    path.totalWeight = currentNeighbour.weightSumTo;
+                    return path;
+                }
             }
-            if (nextDspNode.vertex == target) break;
-            nextDspNode = progressData.values().stream().filter(dspNode -> !dspNode.marked).reduce((o1, o2) -> {
-                int compare = Double.compare(o1.weightSumTo, o2.weightSumTo);
-                if (compare > 0) return o1;
-                else if (compare < 0) return o2;
-                else return o1;
-            }).orElse(null);
+            currentDspNode.marked = true;
+            double leastWeight = Double.MAX_VALUE;
+            boolean notVisited = false;
+            for (DSPNode node : nodes) {
+                if (!node.marked) {
+                    if (leastWeight >= node.weightSumTo) {
+                        leastWeight = node.weightSumTo;
+                        current = node.vertex;
+                    }
+                }
+                if (!node.marked) {
+                    notVisited = true;
+                }
+            }
+            if (!notVisited) {
+                current = null;
+            }
         }
-
-        path.totalWeight = progressData.values().stream().mapToDouble(value -> value.weightSumTo).sum();
-
-        // no path found, graph was not connected ???
-        return path;
+        return null;
     }
-
-    // TODO continue Dijkstra's algorithm to process nextDspNode
-    //  mark nodes as you complete their processing
-    //  register all visited vertices while going for statistical purposes
-    //  if you hit the target: complete the path and bail out !!!
-
-//            for (V neighbour : this.getNeighbours(nextDspNode.vertex)){
-//                DSPNode neighbourNode = new DSPNode(neighbour);
-//                double weight = weightMapper.apply(this.getEdge(neighbourNode.vertex, neighbour));
-//                double distanceFromNextNode = nextDspNode.weightSumTo + weight;
-//                if (distanceFromNextNode < neighbourNode.weightSumTo){
-//                    neighbourNode.weightSumTo = distanceFromNextNode;
-//                    neighbourNode.fromVertex = neighbour;
-//                    neighbourNode.marked = true;
-//                    progressData.put(neighbour, neighbourNode);
-//                }
-//
-//            }
-//            if (nextDspNode.vertex == target) break;
-//            nextDspNode = progressData.values().stream().filter(dspNode -> !dspNode.marked).reduce((o1, o2) -> {
-//                int compare = Double.compare(o1.weightSumTo, o2.weightSumTo);
-//                if (compare > 0){
-////                        path.vertices.add(o1.vertex) ;
-//                    return o1;
-//                }
-//                else if (compare < 0){
-////                        path.vertices.add(o2.vertex);
-//                    return o2;
-//                }
-//                else return o1;
-//            }).orElse(null);
-//
-//
-//            // TODO find the next nearest node that is not marked yet
-//
-//
-//
-////            return path;
-//        }
-//        path.totalWeight = progressData.values().stream().mapToDouble(value -> value.weightSumTo).sum();
-//
-//        // no path found, graph was not connected ???
-//        return path;
-//    }
-
 
     @Override
     public String toString() {

@@ -30,16 +30,13 @@ public class RoutePlannerMain {
         doPathSearches(roadMap, FROM_ID, TO_ID);
 
         // now we have an accident between Diemen and Weesp...
-        // TODO change the roadMap such that max average speed from Diemen to Weesp is only 5 km/h
 
         roadMap.getEdge(roadMap.getVertexById("Diemen"), roadMap.getVertexById("Weesp")).setMaxSpeed(5);
 
         // find the fastest route avoiding the accident
         RoadMap.DGPath path =
                 roadMap.dijkstraShortestPath(FROM_ID, TO_ID,
-                        // TODO provide an edgeWeightCalculator that yields the expected travel time for the road
-
-                        null
+                        (a) -> a.getLength()/a.getMaxSpeed()
                 );
         System.out.println("Dijkstra-accident-Weesp: " + path);
         roadMap.svgDrawMap(String.format("DSPACC-%s-%s.svg", FROM_ID, TO_ID), path);
@@ -65,24 +62,18 @@ public class RoutePlannerMain {
 
         // find the routes by dijkstra-Shortest-Path with minimum total length
         path = roadMap.dijkstraShortestPath(fromId, toId,
-                // TODO provide an edgeWeightCalculator that yields the travel distance for the road
-
-                null
+                Road::getLength
         );
         System.out.println("Dijkstra-Shortest-Path: " + path);
         roadMap.svgDrawMap(String.format("DSP-%s-%s.svg", fromId, toId), path);
         path = roadMap.dijkstraShortestPath(toId, fromId,
-                // TODO provide the same edgeWeightCalculator as above
-
-                null
+                Road::getLength
         );
         System.out.println("Dijkstra-Shortest-Path return: " + path);
 
         // find the routes by dijkstra-Shortest-Path with minimum total travel time
         path = roadMap.dijkstraShortestPath(fromId, toId,
-                // TODO provide an edgeWeightCalculator that yields the expected travel time for the road
-
-                null
+                (a) -> a.getLength()/a.getMaxSpeed()
         );
         System.out.println("Dijkstra-Fastest-Route: " + path);
         roadMap.svgDrawMap(String.format("DFR-%s-%s.svg", fromId, toId), path);

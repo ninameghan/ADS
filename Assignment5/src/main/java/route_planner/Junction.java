@@ -6,16 +6,15 @@ import java.io.PrintStream;
 import java.util.Locale;
 import java.util.Objects;
 
-public class Junction implements Identifiable
-        // TODO extend superclass and/or implement interfaces
+public class Junction implements Identifiable {
 
-{
     private String name;            // unique name of the junction
     private double locationX;       // RD x-coordinate in km
     private double locationY;       // RD y-coordinate in km
     private int population;         // indicates importance of the junction, used for graphical purposes only
 
-    public Junction() {}
+    public Junction() {
+    }
 
     public Junction(String name) {
         this.name = name;
@@ -55,6 +54,7 @@ public class Junction implements Identifiable
 
     /**
      * draws the junction onto an svg image with a given colour
+     *
      * @param svgWriter
      * @param colour
      */
@@ -65,11 +65,10 @@ public class Junction implements Identifiable
         int fontSize = 3;
 
         // accounts for the reversed y-direction of the svg coordinate system relative to RD-coordinates
-        svgWriter.printf(Locale.ENGLISH,"<circle cx='%.3f' cy='%.3f' r='%.3f' fill='%s'/>\n",
+        svgWriter.printf(Locale.ENGLISH, "<circle cx='%.3f' cy='%.3f' r='%.3f' fill='%s'/>\n",
                 locationX, -locationY, radius, colour);
-        svgWriter.printf(Locale.ENGLISH,"<text x='%.3f' y='%.3f' font-size='%d' fill='%s' text-anchor='middle'>%s</text>\n",
+        svgWriter.printf(Locale.ENGLISH, "<text x='%.3f' y='%.3f' font-size='%d' fill='%s' text-anchor='middle'>%s</text>\n",
                 locationX, -locationY - 1.3, fontSize, colour, name);
-
     }
 
     /**
@@ -80,6 +79,7 @@ public class Junction implements Identifiable
     /**
      * Draws the road segment onto a .svg image with the specified colour
      * If no colour is provided, a default will be calculated on the basis of the maxSpeed
+     *
      * @param svgWriter
      * @param colour
      */
@@ -90,7 +90,7 @@ public class Junction implements Identifiable
                 this.getLocationX(), -this.getLocationY(),
                 from.getLocationX(), -from.getLocationY(),
                 width, colour);
-}
+    }
 
     @Override
     public String toString() {
@@ -98,7 +98,8 @@ public class Junction implements Identifiable
     }
 
     /**
-     *  calculates the carthesion distance between two junctions
+     * calculates the carthesion distance between two junctions
+     *
      * @param target
      * @return
      */
@@ -107,17 +108,13 @@ public class Junction implements Identifiable
         // using the locationX and locationY as provided in the dutch RD-coordinate system
         double dX = target.locationX - locationX;
         double dY = target.locationY - locationY;
-        return Math.sqrt(dX*dX + dY*dY);
-
+        return Math.sqrt(dX * dX + dY * dY);
     }
 
     @Override
     public String getId() {
         return this.getName();
     }
-
-    // TODO more implementations as required for use with DirectedGraph, HashSet and/or HashMap
-
 
     @Override
     public boolean equals(Object o) {
