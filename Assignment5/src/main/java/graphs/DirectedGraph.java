@@ -96,7 +96,6 @@ public class DirectedGraph<V extends Identifiable, E> {
         } else {
             return this.vertices.get(newVertex.getId());
         }
-        // a proper vertex shall be returned at all times
     }
 
     /**
